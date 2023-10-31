@@ -1,0 +1,171 @@
+# General realm config
+id: $(env:SERVER)-gw
+realm: $(env:SERVER)-gw
+defaultSignatureAlgorithm: RS256
+accessTokenLifespan: 86400
+accessTokenLifespanForImplicitFlow: 86400
+ssoSessionIdleTimeout: 86400
+enabled: true
+loginWithEmailAllowed: true
+loginTheme: fw_keycloak 
+
+# Clients
+clients:
+  # API
+  - clientId: flowide-api   
+    enabled: true
+    bearerOnly: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    webOrigins:
+      - "*"
+    redirectUris:
+      - "*"
+  # GITLAB  
+  - clientId: gitlab
+    rootUrl: https://$(env:SERVER)-gitlab.$(env:DOMAIN)/
+    baseUrl: https://$(env:SERVER)-gitlab.$(env:DOMAIN)/
+    bearerOnly: false
+    publicClient: false
+    clientAuthenticatorType: client-secret
+    enabled: true
+    webOrigins:
+      - https://$(env:SERVER)-gitlab.$(env:DOMAIN)
+    redirectUris:
+      - "https://$(env:SERVER)-gitlab.$(env:DOMAIN)/*"
+  # Flowide sso
+  - clientId: flowide
+    rootUrl: https://$(env:SERVER)-gw.$(env:DOMAIN)/
+    baseUrl: https://$(env:SERVER)-gw.$(env:DOMAIN)/
+    bearerOnly: false
+    publicClient: false
+    clientAuthenticatorType: client-secret
+    enabled: true
+    webOrigins:
+      - https://$(env:SERVER)-gw.$(env:DOMAIN)
+    redirectUris:
+      - "https://$(env:SERVER)-gw.$(env:DOMAIN)/*"
+  # WORKBENCH  
+  - clientId: flowide-workbench
+    rootUrl: https://$(env:SERVER)-gw.$(env:DOMAIN)/workbench
+    baseUrl: https://$(env:SERVER)-gw.$(env:DOMAIN)/workbench
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    webOrigins:
+      - https://$(env:SERVER)-gw.$(env:DOMAIN)
+    redirectUris:
+      - "https://$(env:SERVER)-gw.$(env:DOMAIN)/*"
+    attributes:
+      post.logout.redirect.uris: "https://$(env:SERVER)-gw.$(env:DOMAIN)/*"
+    protocolMappers:
+      - name: allowed_releases_mapper # Allowed releases to access token mapper
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+        consentRequired: false
+        config:
+          userinfo.token.claim: false
+          multivalued: true
+          user.attribute: allowed_releases
+          id.token.claim: false
+          access.token.claim: true
+          claim.name: user_data.allowed_releases
+      - name: allowed_from_user_mapper # Allowed from user to access token mapper
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+        consentRequired: false
+        config:
+          aggregate.attrs: false
+          multivalued: true
+          userinfo.token.claim: false
+          user.attribute: allowed_from_user
+          id.token.claim: false
+          access.token.claim: true
+          claim.name: user_data.allowed_from_user
+          jsonType.label: int
+
+
+# Roles (permissions)
+roles:
+  realm:
+    - name: default-roles-$(env:SERVER)-gw
+      composite: true
+      composites:
+        realm:
+          - offline_access
+          - uma_authorization
+        client: 
+          flowide-api:
+            - run:script
+          account:
+            - view-profile
+            - manage-account
+  client:
+    flowide-api:
+      - name: create:repo
+        composite: false
+        clientRole: true
+      - name: edit:repo
+        composite: false
+        clientRole: true
+      - name: read:user
+        composite: false
+        clientRole: true
+      - name: create:release
+        composite: false
+        clientRole: true
+      - name: manage:service
+        composite: false
+        clientRole: true
+      - name: delete:repo
+        composite: false
+        clientRole: true
+      - name: fork:repo
+        composite: false
+        clientRole: true
+      - name: run:script
+        composite: false
+        clientRole: true
+
+users:
+  - username: apps-admin
+    enabled: true
+    email: apps-admin@flowide.net
+    firstName: Apps
+    lastName: Admin
+    credentials:
+      - type: password
+        value: $(env:APPS_ADMIN_PASSWORD)
+        temporary: false
+    clientRoles:
+      flowide-api:
+        - create:repo
+        - edit:repo
+        - read:user
+        - create:release
+        - manage:service
+        - delete:repo
+        - fork:repo
+        - run:script
+      realm-management:
+        - create-client
+        - impersonation
+        - manage-authorization
+        - manage-clients
+        - manage-events
+        - manage-identity-providers
+        - manage-realm
+        - manage-users
+        - query-clients
+        - query-groups
+        - query-realms
+        - query-users
+        - realm-admin
+        - view-authorization
+        - view-clients
+        - view-events
+        - view-identity-providers
+        - view-realm
+        - view-users

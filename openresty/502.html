@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Loading</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        width:100vw;
+        height: 100vh;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+      }
+      .lds-dual-ring {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+      }
+      .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6px solid #fff;
+        border-color: #000 transparent #000 transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+      }
+      h4 {
+        padding: 10px;
+        opacity: 0.3;
+        text-align: center;
+        display: block;
+        width: 320px;
+      }
+      @keyframes lds-dual-ring {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lds-dual-ring"></div>
+      <h4>Booting up application instance</h4>
+    </div>
+
+    <noscript>Your browser doesn’t support javascript.</noscript>
+
+    <script>
+      let retry_current = 1;
+      let retry_max = 4096;
+      const check_response = async function () {
+        console.log("Retrying in " + retry_current + " seconds");
+        await fetch(window.location.href, { method: "HEAD" }).then(
+          (response) => {
+            switch (response.status) {
+              case 200:
+                window.location.reload();
+                break;
+              case 502:
+                if (retry_current < retry_max) {
+                  retry_current *= 2;
+                }
+                setTimeout(check_response, retry_current * 1000);
+            }
+          }
+        );
+      };
+      setTimeout(check_response, retry_current * 1000);
+    </script>
+  </body>
+</html>
