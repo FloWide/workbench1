@@ -19,7 +19,7 @@ else
 fi
 
 echo "Running DCM with executable $DCM"
-eval "$DCM --translator /app/translator/translator.py  --port ${DCM_PORT} -c -l ${DCM_LOG_LEVEL}  -s '-f ${DCM_STORAGE_FILE} -i ${DCM_SAVE_INTERVAL} -k ${DCM_KEEP_INTERVAL}' " & >> /dev/stdout
+eval "$DCM --port ${DCM_PORT} -c -l ${DCM_LOG_LEVEL}  -s '-f ${DCM_STORAGE_FILE} -i ${DCM_SAVE_INTERVAL} -k ${DCM_KEEP_INTERVAL}' " & >> /dev/stdout
 echo $! > /var/run/dcm.pid
 
 ./webhook.sh
