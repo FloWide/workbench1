@@ -26,15 +26,16 @@ Buffering Data Communications Layer (BDCL) is neccesarry to convert the sensor a
 SCL calulcates the position of trackers that have timing coming from UWB communication layer. In order for positioning to work, service has to be configured. After restart SCL container calls a pre-defined API call and waits for configuration API commands.
 
 ## Installation
-1.) Check out the repository: git clone https://github.com/FloWide/workbench1
-2.) Copy directory to /root/docker-deployment
-3.) Set the values in .env file based on the template
-4.) Run instal.sh that installs the flowide command line interface
-5.) start system with flowide docker up
+
+1. Check out the repository: git clone https://github.com/FloWide/workbench1
+2. Copy directory to /root/docker-deployment
+3. Set the values in .env file based on the template
+4. Run `instal.sh` that installs the flowide command line interface
+5. start system with command: `flowide docker up`
 
 System will be accessible under the domain configured in the .env file.
 
-Other command can be checked with flowide docker --help
+Other command can be checked with `flowide docker --help`
 
 
 
