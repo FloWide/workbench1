@@ -30,7 +30,7 @@ SCL calulcates the position of trackers that have timing coming from UWB communi
 1. Check out the repository: git clone https://github.com/FloWide/workbench1
 2. Copy directory to /root/docker-deployment
 3. Set the values in .env file based on the template
-4. Run `instal.sh` that installs the flowide command line interface
+4. Run `install.sh` that installs the flowide command line interface
 5. start system with command: `flowide docker up`
 
 System will be accessible under the domain configured in the .env file.
